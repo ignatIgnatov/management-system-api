@@ -1,12 +1,7 @@
 package com.system.management.model;
 
-import com.system.management.model.enums.RoleEnum;
 import jakarta.persistence.*;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import java.util.*;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
@@ -29,8 +24,12 @@ public class UserEntity implements UserDetails {
   @Column(name = "password", nullable = false)
   private String password;
 
-  @Enumerated(EnumType.STRING)
-  private RoleEnum role;
+  @ManyToMany(cascade = CascadeType.ALL)
+  @JoinTable(
+      name = "user_role",
+      joinColumns = @JoinColumn(name = "user_id"),
+      inverseJoinColumns = @JoinColumn(name = "role_id"))
+  private Set<RoleEntity> authorities = new HashSet<>();
 
   public UserEntity() {}
 
@@ -38,21 +37,20 @@ public class UserEntity implements UserDetails {
       UUID id,
       String firstName,
       String lastName,
-      String username,
       String email,
       String password,
-      RoleEnum role) {
+      Set<RoleEntity> authorities) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
     this.password = password;
-    this.role = role;
+    this.authorities = authorities;
   }
 
   @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+  public Set<RoleEntity> getAuthorities() {
+    return authorities;
   }
 
   public UUID getId() {
@@ -93,14 +91,6 @@ public class UserEntity implements UserDetails {
 
   public void setPassword(String password) {
     this.password = password;
-  }
-
-  public RoleEnum getRole() {
-    return role;
-  }
-
-  public void setRole(RoleEnum role) {
-    this.role = role;
   }
 
   @Override

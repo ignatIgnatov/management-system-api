@@ -3,10 +3,7 @@ package com.system.management.security.jwt;
 import com.system.management.exception.security.InvalidSecretKeyException;
 import com.system.management.exception.security.jwt.JwtExpiredException;
 import com.system.management.exception.security.jwt.JwtIsNotValidException;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.WeakKeyException;
@@ -32,11 +29,11 @@ public class JwtUtils {
 
   public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
     return Jwts.builder()
-        .claims(extraClaims)
-        .subject(userDetails.getUsername())
-        .issuedAt(Date.from(Instant.now()))
-        .expiration(Date.from(Instant.now().plusMillis(tokenExpiration)))
-        .signWith(getSigningKey())
+            .claims(extraClaims)
+            .subject(userDetails.getUsername())
+            .issuedAt(Date.from(Instant.now()))
+            .expiration(Date.from(Instant.now().plusMillis(tokenExpiration)))
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
         .compact();
   }
 

@@ -83,7 +83,8 @@ public class SecurityConfig {
       JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
       JwtAuthenticationFilter jwtAuthenticationFilter)
       throws Exception {
-    http.csrf(AbstractHttpConfigurer::disable)
+    http
+            .csrf(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
         .sessionManagement(
