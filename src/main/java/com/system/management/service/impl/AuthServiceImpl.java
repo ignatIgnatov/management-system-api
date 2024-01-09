@@ -28,10 +28,11 @@ public class AuthServiceImpl implements AuthService {
   private final PasswordEncoder passwordEncoder;
 
   public AuthServiceImpl(
-          UserRepository userRepository,
-          AuthenticationManager authenticationManager,
-          JwtUtils jwtUtils,
-          ModelMapper modelMapper, PasswordEncoder passwordEncoder) {
+      UserRepository userRepository,
+      AuthenticationManager authenticationManager,
+      JwtUtils jwtUtils,
+      ModelMapper modelMapper,
+      PasswordEncoder passwordEncoder) {
     this.userRepository = userRepository;
     this.authenticationManager = authenticationManager;
     this.jwtUtils = jwtUtils;
@@ -71,10 +72,13 @@ public class AuthServiceImpl implements AuthService {
     return modelMapper.map(user, UserResponseDto.class);
   }
 
-  private UserEntity createUserInDatabase(UserRegisterRequestDto requestDto, String encodedPassword) {
+  private UserEntity createUserInDatabase(
+      UserRegisterRequestDto requestDto, String encodedPassword) {
     UserEntity user = new UserEntity();
     user.setEmail(requestDto.getEmail());
     user.setPassword(encodedPassword);
+    user.setFirstName(requestDto.getFirstName());
+    user.setLastName(requestDto.getLastName());
     userRepository.save(user);
     return user;
   }
@@ -86,14 +90,12 @@ public class AuthServiceImpl implements AuthService {
   }
 
   private UserEntity getUserByEmail(String email) {
-    return userRepository
-        .findByEmail(email)
-        .orElseThrow(() -> new UserNotFoundException(email));
+    return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
   }
 
   private void checkForExistingUser(UserRegisterRequestDto userRegisterRequestDto) {
     UserEntity user = userRepository.findByEmail(userRegisterRequestDto.getEmail()).orElse(null);
-    if(user != null) {
+    if (user != null) {
       throw new UserExistsException(userRegisterRequestDto.getEmail());
     }
   }
