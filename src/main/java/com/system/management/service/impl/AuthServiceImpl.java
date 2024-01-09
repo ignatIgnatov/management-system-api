@@ -14,13 +14,12 @@ import com.system.management.model.enums.RoleEnum;
 import com.system.management.repository.UserRepository;
 import com.system.management.security.jwt.JwtUtils;
 import com.system.management.service.AuthService;
+import java.util.Set;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Set;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -71,13 +70,12 @@ public class AuthServiceImpl implements AuthService {
     String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
     checkForPasswordMatches(requestDto, encodedPassword);
 
-    UserEntity user = createUserInDatabase(requestDto, encodedPassword);
-
+    UserEntity user = createUser(requestDto, encodedPassword);
+    userRepository.save(user);
     return modelMapper.map(user, UserResponseDto.class);
   }
 
-  private UserEntity createUserInDatabase(
-      UserRegisterRequestDto requestDto, String encodedPassword) {
+  private UserEntity createUser(UserRegisterRequestDto requestDto, String encodedPassword) {
 
     RoleEntity roleEntity = new RoleEntity(RoleEnum.USER);
     if (userRepository.count() == 0) {
@@ -90,7 +88,7 @@ public class AuthServiceImpl implements AuthService {
     user.setFirstName(requestDto.getFirstName());
     user.setLastName(requestDto.getLastName());
     user.setAuthorities(Set.of(roleEntity));
-    userRepository.save(user);
+
     return user;
   }
 
