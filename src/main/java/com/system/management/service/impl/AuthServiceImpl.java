@@ -8,7 +8,9 @@ import com.system.management.exception.UserExistsException;
 import com.system.management.exception.not_found.UserNotFoundException;
 import com.system.management.exception.security.InvalidCredentialsException;
 import com.system.management.exception.security.jwt.JwtAuthenticationBaseException;
+import com.system.management.model.RoleEntity;
 import com.system.management.model.UserEntity;
+import com.system.management.model.enums.RoleEnum;
 import com.system.management.repository.UserRepository;
 import com.system.management.security.jwt.JwtUtils;
 import com.system.management.service.AuthService;
@@ -17,6 +19,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -74,11 +78,18 @@ public class AuthServiceImpl implements AuthService {
 
   private UserEntity createUserInDatabase(
       UserRegisterRequestDto requestDto, String encodedPassword) {
+
+    RoleEntity roleEntity = new RoleEntity(RoleEnum.USER);
+    if (userRepository.count() == 0) {
+      roleEntity.setRole(RoleEnum.ADMIN);
+    }
+
     UserEntity user = new UserEntity();
     user.setEmail(requestDto.getEmail());
     user.setPassword(encodedPassword);
     user.setFirstName(requestDto.getFirstName());
     user.setLastName(requestDto.getLastName());
+    user.setAuthorities(Set.of(roleEntity));
     userRepository.save(user);
     return user;
   }

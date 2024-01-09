@@ -20,6 +20,10 @@ public class RoleEntity implements GrantedAuthority {
     public RoleEntity() {
     }
 
+    public RoleEntity(RoleEnum role) {
+        this.role = role;
+    }
+
     public RoleEntity(UUID id, RoleEnum role) {
         this.id = id;
         this.role = role;

@@ -53,6 +53,10 @@ public class UserEntity implements UserDetails {
     return authorities;
   }
 
+  public void setAuthorities(Set<RoleEntity> authorities) {
+    this.authorities = authorities;
+  }
+
   public UUID getId() {
     return id;
   }
